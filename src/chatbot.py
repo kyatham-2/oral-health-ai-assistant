@@ -1,8 +1,9 @@
 from src.retriever import get_relevant_docs
 from google import genai
+import streamlit as st
 import os
 
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 
 # 🔹 classify query
 def is_dental_query(query):
@@ -23,6 +24,11 @@ def generate_answer(query, age_group, chat_history, summary):
     history_text = ""
     for msg in chat_history[-6:]:
        history_text += f"{msg['role']}: {msg['content']}\n"
+
+
+    # if not is_dental_query(query):
+    #     answer = handle_general_query(query,age_group)
+    #     return answer,summary
 
     # 🔹 DENTAL → RAG + Gemini
     docs = get_relevant_docs(query)
