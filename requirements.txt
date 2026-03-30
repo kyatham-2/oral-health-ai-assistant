@@ -1,0 +1,6 @@
+streamlit
+google-genai
+faiss-cpu
+langchain
+langchain-huggingface
+sentence-transformers
