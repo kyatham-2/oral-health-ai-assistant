@@ -1,9 +1,11 @@
 from src.retriever import get_relevant_docs
+from groq import Groq
 from google import genai
 import streamlit as st
 import os
 
-client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+# client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # 🔹 classify query
 def is_dental_query(query):
@@ -86,13 +88,19 @@ Context:
 Question:
 {query}
 """
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
+    response = client.chat.completions.create(
+    messages=[
+        {"role": "user", "content": prompt}
+    ],
+    model="llama-3.3-70b-versatile"
     )
 
-    answer = response.text
+    # response = client.models.generate_content(
+    #     model="gemini-2.5-flash",
+    #     contents=prompt
+    # )
+    answer = response.choices[0].message.content
+    # answer = response.text
     summary_prompt = f"""
 Summarize the conversation briefly.
 
@@ -105,12 +113,21 @@ Assistant: {answer}
 
 Updated summary:
 """  
-    summary_response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=summary_prompt
-    )
+    # summary_response = client.models.generate_content(
+    #     model="gemini-2.5-flash",
+    #     contents=summary_prompt
+    # )
 
-    new_summary = summary_response.text
+    # new_summary = summary_response.text
+
+    summary_response = client.chat.completions.create(
+    messages=[
+        {"role": "user", "content": summary_prompt}
+    ],
+    model="llama-3.3-70b-versatile"
+)
+
+    new_summary = summary_response.choices[0].message.content
 
     return answer, new_summary
 
@@ -133,9 +150,17 @@ User:
 {query}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
+    # response = client.models.generate_content(
+    #     model="gemini-2.5-flash",
+    #     contents=prompt
+    # )
+
+    # return response.text
+    response = client.chat.completions.create(
+    messages=[
+        {"role": "user", "content": prompt}
+    ],
+    model="llama-3.3-70b-versatile"
     )
 
-    return response.text
+    return response.choices[0].message.content
