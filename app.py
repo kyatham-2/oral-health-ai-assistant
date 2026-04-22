@@ -1,17 +1,84 @@
 import streamlit as st
+import os
 from src.chatbot import generate_answer
 
-st.title("🦷 Oral Health AI Assistant")
+
+st.markdown("""
+<style>
+.stApp {
+    background: linear-gradient(135deg, #EAF7F3, #F8FBFA);
+}
+</style>
+""", unsafe_allow_html=True)
+
+user_avatar = os.path.join("assets", "User.png")
+bot_avatar = os.path.join("assets", "Doctor.png")
+
+st.markdown("""
+<h1 style='text-align: center; color: #2E8B57;'>
+🦷 Oral Health AI Assistant
+</h1>
+""", unsafe_allow_html=True)
+st.markdown("""
+<div style="
+background-color:#E6F4EA;
+padding:12px;
+border-radius:10px;
+border:1px solid #B7E4C7;
+text-align:center;
+">
+🩺 Welcome! This assistant helps you understand oral health in a simple and friendly way.
+</div>
+""", unsafe_allow_html=True)
+st.markdown("""
+<style>
+
+/* Remove default box feel */
+[data-testid="stChatMessage"] {
+    background: transparent !important;
+    border: none !important;
+    padding: 8px 0px !important;
+}
+
+/* User bubble (right side) */
+[data-testid="stChatMessage"][data-testid*="user"] > div {
+    background-color: #E8F5E9;
+    border-radius: 16px;
+    padding: 12px 16px;
+    max-width: 70%;
+    margin-left: auto;
+}
+
+/* Bot bubble (left side) */
+[data-testid="stChatMessage"][data-testid*="assistant"] > div {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 12px 16px;
+    max-width: 70%;
+    margin-right: auto;
+    border: 1px solid #E0E0E0;
+}
+
+</style>
+""", unsafe_allow_html=True)
+st.markdown("""
+<style>
+.stTextInput input {
+    border-radius: 10px;
+    border: 1px solid #95D5B2;
+}
+</style>
+""", unsafe_allow_html=True)
 
 if "summary" not in st.session_state:
     st.session_state.summary = ""
 
 if "age_group" not in st.session_state:
-    st.subheader("Welcome 👋")
-    st.write("Please select your age group to continue:")
-
+    # st.write("Please select your age group to continue:")
     age_group = st.selectbox(
-        "Select age group:",
+        # st.write("Please select your age group:"),
+        # "Select age group:",
+        "Please select your age group to continue:",
         ["Child", "Adult", "Elderly"]
     )
 
@@ -24,8 +91,17 @@ if "age_group" not in st.session_state:
     st.stop()  # stop app until age is selected
 
 # 🔹 Show selected age
-st.write(f"👤 Age group: {st.session_state.age_group}")
-st.info("💡 Answers will be tailored based on your age group.")
+# st.write(f"👤 Age group: {st.session_state.age_group}")
+st.markdown(f"""
+<div style="
+padding:12px;
+border-radius:10px;
+text-align:left; color:#2E8B57;
+">
+💡 Answers will be tailored based on {st.session_state.age_group} age group
+</div>
+""", unsafe_allow_html=True)
+# st.write("💡 Answers will be tailored based on your age group.")
 
 # 🔹 Initialize chat history
 if "messages" not in st.session_state:
@@ -33,7 +109,8 @@ if "messages" not in st.session_state:
 
 # 🔹 Display previous messages
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    avatar = user_avatar if msg["role"] == "user" else bot_avatar
+    with st.chat_message(msg["role"], avatar=avatar):
         st.write(msg["content"])
 
 # 🔹 User input
@@ -46,7 +123,7 @@ if user_input:
         "content": user_input
     })
 
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=user_avatar):
         st.write(user_input)
 
     # Generate response
@@ -65,5 +142,5 @@ if user_input:
         "content": answer
     })
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant",  avatar=bot_avatar):
         st.write(answer)
